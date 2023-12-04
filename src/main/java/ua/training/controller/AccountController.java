@@ -26,10 +26,12 @@ import javax.validation.Valid;
  */
 @Controller
 public class AccountController {
+    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
     @Autowired
-    public AccountController(UserService userService) {
+    public AccountController(PasswordEncoder passwordEncoder, UserService userService) {
+        this.passwordEncoder = passwordEncoder;
         this.userService = userService;
     }
 
@@ -50,11 +52,20 @@ public class AccountController {
         }
         User user = new User.Builder()
                 .login(userDto.getLogin())
-                .password(userDto.getPassword())
+                .password(passwordEncoder.encode(userDto.getPassword()))
                 .role(Role.READER)
                 .isBlocked(false)
                 .build();
         userService.singUpUser(user);
         return "redirect:/signup?success=true";
+    }
+
+    @GetMapping("/login")
+    public String showLoginForm() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return "login";
+        }
+        return "redirect:/";
     }
 }
