@@ -54,42 +54,42 @@ public class BookTranslate {
         private String editionName;
         private String authorsString;
 
-        public Builder id(long id) {
+        public BookTranslate.Builder id(long id) {
             this.id = id;
             return this;
         }
 
-        public Builder book(Book book) {
+        public BookTranslate.Builder book(Book book) {
             this.book = book;
             return this;
         }
 
-        public Builder language(Language language) {
+        public BookTranslate.Builder language(Language language) {
             this.language = language;
             return this;
         }
 
-        public Builder title(String title) {
+        public BookTranslate.Builder title(String title) {
             this.title = title;
             return this;
         }
 
-        public Builder description(String description) {
+        public BookTranslate.Builder description(String description) {
             this.description = description;
             return this;
         }
 
-        public Builder languageOfBook(String languageOfBook) {
+        public BookTranslate.Builder languageOfBook(String languageOfBook) {
             this.languageOfBook = languageOfBook;
             return this;
         }
 
-        public Builder editionName(String editionName) {
+        public BookTranslate.Builder editionName(String editionName) {
             this.editionName = editionName;
             return this;
         }
 
-        public Builder authorsString(String authorsString) {
+        public BookTranslate.Builder authorsString(String authorsString) {
             this.authorsString = authorsString;
             return this;
         }
@@ -110,7 +110,7 @@ public class BookTranslate {
      * @param builder - translate builder
      * @see BookTranslate#BookTranslate()
      */
-    public BookTranslate(Builder builder) {
+    public BookTranslate(BookTranslate.Builder builder) {
         this.id = builder.id;
         this.book = builder.book;
         this.language = builder.language;
