@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import ua.training.model.User;
 import ua.training.service.UserService;
 
-import java.util.ArrayList;
-
 @Service("userDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -25,6 +23,5 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userService.findByLogin(login).orElseThrow(
                 () -> new UsernameNotFoundException("User with email does not exist"));
         return new CustomUserDetails(user);
-//        return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(), new ArrayList<>());
     }
 }

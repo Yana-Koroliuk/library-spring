@@ -7,31 +7,26 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import ua.training.model.enums.Role;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
+    private final LoginSuccessHandler loginSuccessHandler;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsService userDetailsService) {
+    public WebSecurityConfig(UserDetailsService userDetailsService, LoginSuccessHandler loginSuccessHandler) {
         this.userDetailsService = userDetailsService;
+        this.loginSuccessHandler = loginSuccessHandler;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeRequests()
                 .mvcMatchers("/admin/**").hasAuthority("ADMIN")
                 .mvcMatchers("/librarian/**").hasAuthority("LIBRARIAN")
@@ -40,32 +35,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login")
                 .usernameParameter("login")
-                .successHandler(new SavedRequestAwareAuthenticationSuccessHandler() {
-                    @Override
-                    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
-                        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-                        String username = userDetails.getUsername();
-                        System.out.println("The user " + username + " has logged in.");
-                        System.out.println(request.getContextPath());
-                        String redirectURL = request.getContextPath();
-                        if (userDetails.hasRole(Role.READER)) {
-                            redirectURL += "/reader/home";
-                        } else if (userDetails.hasRole(Role.LIBRARIAN)) {
-                            redirectURL += "/librarian/home";
-                        } else if (userDetails.hasRole(Role.ADMIN)) {
-                            redirectURL += "/admin/home";
-                        } else {
-                            response.sendError(404);
-                        }
-                        response.sendRedirect(redirectURL);
-                    }
-                })
+                .successHandler(loginSuccessHandler)
                 .failureUrl("/login?error=true")
                 .permitAll()
                 .and()
                 .logout()
+                .deleteCookies("JSESSIONID")
+                .invalidateHttpSession(false)
                 .logoutSuccessUrl("/")
                 .permitAll()
+                .and()
+                .rememberMe()
+                .userDetailsService(userDetailsService)
+                .key("2w6f-6f00-gglf-jkhj")
+                .tokenValiditySeconds(1000)
                 .and()
                 .anonymous()
                 .and()
