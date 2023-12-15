@@ -43,14 +43,9 @@
                 </th:block>
             </select>
         </div>
-        <th:block sec:authorize="isAnonymous()">
-            <a class="btn btn-outline-dark mr-2" data-mdb-ripple-color="dark" href="/signup"
-               th:text="#{header.signup}"></a>
-            <a class="btn btn-dark" href="/login" th:text="#{header.login}"></a>
-        </th:block>
-        <th:block sec:authorize="isAuthenticated()">
+        <div>
             <a class="btn btn-dark" href="/logout" th:text="#{header.logout}"></a>
-        </th:block>
+        </div>
     </div>
 </header>
 <nav class="nav nav-tabs nav-justified">
@@ -111,11 +106,11 @@
                         <td>
                             <a th:if="${order.getOrderStatus().name().equals('APPROVED')}" type="button"
                                class="btn btn-outline-info"
-                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}}"
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=1'}"
                                th:text="#{reader.returnBook}"></a>
                             <a th:if="${order.getOrderStatus().name().equals('OVERDUE')}" type="button"
                                class="btn btn-outline-warning"
-                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}}"
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=1'}"
                                th:text="#{reader.payFine.begin}+' '+${order.getFine()}+' '+#{reader.payFine.end}"></a>
                         </td>
                     </tr>
@@ -156,7 +151,7 @@
                         <td th:text="${order.endDate}"></td>
                         <td>
                             <a type="button" class="btn btn-outline-warning"
-                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}}"
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=2'}"
                                th:text="#{reader.cancelOrder}"></a>
                         </td>
                     </tr>
@@ -198,12 +193,12 @@
                         <td>
                             <a th:if="${order.getOrderStatus().name().equals('RECEIVED')}" type="button"
                                class="btn btn-outline-info"
-                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}}"
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=3'}"
                                th:text="#{reader.cancelOrder}"></a>
                             <a th:if="${order.getOrderStatus().name().equals('CANCELED')}" type="button"
                                class="btn btn-outline-warning"
-                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}}"
-                               th:text="#{reader.deleteMesage}"></a>
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=3'}"
+                               th:text="#{reader.deleteMessage}"></a>
                         </td>
                     </tr>
                 </table>

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:lang="${(#locale.language == null && #httpServletRequest.getParameter('lang') == null) || (#locale.language != null && #locale.language.equals('en')) || (#httpServletRequest.getParameter('lang') != null && #httpServletRequest.getParameter('lang').equals('en')) ? 'en' : 'uk'}">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -43,24 +42,19 @@
                 </th:block>
             </select>
         </div>
-        <th:block sec:authorize="isAnonymous()">
-            <a class="btn btn-outline-dark mr-2" data-mdb-ripple-color="dark" href="/signup"
-               th:text="#{header.signup}"></a>
-            <a class="btn btn-dark" href="/login" th:text="#{header.login}"></a>
-        </th:block>
-        <th:block sec:authorize="isAuthenticated()">
+        <div>
             <a class="btn btn-dark" href="/logout" th:text="#{header.logout}"></a>
-        </th:block>
+        </div>
     </div>
 </header>
 <nav class="nav nav-tabs nav-justified">
     <th:block th:if="${tab == 1}">
         <a class="nav-item nav-link active" data-toggle="tab" href="#orders" th:text="#{tabs.orders}"></a>
-        <a class="nav-item nav-link" data-toggle="tab" href="#subscriptions" th:text="#{tabs.suscriptions}"></a>
+        <a class="nav-item nav-link" data-toggle="tab" href="#subscriptions" th:text="#{tabs.subscriptions}"></a>
     </th:block>
     <th:block th:if="${tab == 2}">
         <a class="nav-item nav-link" data-toggle="tab" href="#orders" th:text="#{tabs.orders}"></a>
-        <a class="nav-item nav-link active" data-toggle="tab" href="#subscriptions" th:text="#{tabs.suscriptions}"></a>
+        <a class="nav-item nav-link active" data-toggle="tab" href="#subscriptions" th:text="#{tabs.subscriptions}"></a>
     </th:block>
 </nav>
 <br/>
@@ -133,6 +127,5 @@
         </div>
     </div>
 </div>
-<div th:replace="fragment/footer.html :: footer"></div>
 </body>
 </html>
