@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${(#locale.language == null && #httpServletRequest.getParameter('lang') == null) || (#locale.language != null && #locale.language.equals('en')) || (#httpServletRequest.getParameter('lang') != null && #httpServletRequest.getParameter('lang').equals('en')) ? 'en' : 'uk'}">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Registration page for librarian</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div th:replace="fragment/header.html :: header"></div>
+<div class="container text-center" style="margin-top: 10%;">
+    <h3 th:text="#{admin.createLibrarianTitle}"></h3>
+    <form id="form" method="post" th:action="@{/admin/addLibrarian}" th:object="${user}">
+        <div class="form-group">
+            <span th:if="${param.error}" class="text-danger" th:text="#{admin.createAdmin.param.error}"></span>
+            <span th:if="${createError == true}" class="text-danger" th:text="#{signup.error.message.login}"></span>
+            <span th:if="${successCreation == true}" class="text-success"
+                  th:text="#{admin.createLibrarian.success}"></span>
+            <div>
+                <label style="width: 230px;">
+                    <input class="form-control" type="text" id="login" th:field="*{login}"
+                           th:placeholder="#{placeholder.login}">
+                    <span class="text-danger" style="text-align: justify;" id="loginMessage"></span>
+                    <span class="text-danger" style="text-align: justify;" th:if="${#fields.hasErrors('login')}"
+                          th:errors="*{login}"></span>
+                </label>
+            </div>
+            <div>
+                <label style="width: 230px;">
+                    <input class="form-control" type="password" id="password" th:field="${user.password}"
+                           th:placeholder="#{placeholder.password}">
+                    <span class="text-danger" style="text-align: justify;" id="passwordMessage"></span>
+                    <span class="text-danger" style="text-align: justify;" th:if="${#fields.hasErrors('password')}"
+                          th:errors="*{password}"></span>
+                </label>
+            </div>
+            <div>
+                <input type="submit" class="btn btn-outline-info" th:value="#{admin.createLibrarianButton}">
+            </div>
+        </div>
+    </form>
+    <div>
+        <a style="padding-left: 130px;" href="/admin/home?tab=1&page=1" th:text="#{user.to.homeCabinet}"></a>
+    </div>
+</div>
+<div th:replace="fragment/footer.html :: footer"></div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    const loginValidateMessage1 = /*[[#{login.validation.message1}]]*/ '';
+    const loginValidateMessage2 = /*[[#{login.validation.message2}]]*/ '';
+    const passwordValidateMessage1 = /*[[#{password.validation.message1}]]*/ '';
+    const passwordValidateMessage2 = /*[[#{password.validation.message2}]]*/ '';
+
+    /*]]>*/
+</script>
+<script type="text/javascript" th:src="@{/js/signup.js}"></script>
+</body>
+</html>

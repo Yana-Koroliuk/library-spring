@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:lang="${(#locale.language == null && #httpServletRequest.getParameter('lang') == null) || (#locale.language != null && #locale.language.equals('en')) || (#httpServletRequest.getParameter('lang') != null && #httpServletRequest.getParameter('lang').equals('en')) ? 'en' : 'uk'}">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>User home page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="d-flex align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+    <span class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none h3"
+          th:text="#{header.library.name}"></span>
+    <div class="d-flex flex-row mr-3">
+        <div class="mr-2">
+            <select class="custom-select" onchange="location.href = this.options[this.selectedIndex].value">
+                <th:block
+                        th:if="${(#locale.language == null && #httpServletRequest.getParameter('lang') == null) || (#locale.language != null && #locale.language.equals('en')) || (#httpServletRequest.getParameter('lang') != null && #httpServletRequest.getParameter('lang').equals('en'))}">
+                    <option th:value="${#httpServletRequest.requestURI}+'?tab='+${tab}+'&page='+${currPage}+'&lang=en'"
+                            selected
+                            th:text="#{header.language.english}"></option>
+                    <option th:value="${#httpServletRequest.requestURI}+'?tab='+${tab}+'&page='+${currPage}+'&lang=uk'"
+                            th:text="#{header.language.ukrainian}"></option>
+                </th:block>
+                <th:block
+                        th:if="${(#httpServletRequest.getParameter('lang') != null && #httpServletRequest.getParameter('lang').equals('uk')) || #locale.language.equals('uk')}">
+                    <option th:value="${#httpServletRequest.requestURI}+'?tab='+${tab}+'&page='+${currPage}+'&lang=en'"
+                            th:text="#{header.language.english}"></option>
+                    <option th:value="${#httpServletRequest.requestURI}+'?tab='+${tab}+'&page='+${currPage}+'&lang=uk'"
+                            selected
+                            th:text="#{header.language.ukrainian}"></option>
+                </th:block>
+            </select>
+        </div>
+        <div>
+            <a class="btn btn-dark" href="/logout" th:text="#{header.logout}"></a>
+        </div>
+    </div>
+</header>
+<nav class="nav nav-tabs nav-justified">
+    <th:block th:if="${tab == 1}">
+        <a class="nav-item nav-link active" data-toggle="tab" href="#subscription" th:text="#{table.subscription}"></a>
+        <a class="nav-item nav-link" data-toggle="tab" href="#readingHole" th:text="#{tabs.readingHole}"></a>
+        <a class="nav-item nav-link" data-toggle="tab" href="#orders" th:text="#{tabs.orders}"></a>
+    </th:block>
+    <th:block th:if="${tab == 2}">
+        <a class="nav-item nav-link" data-toggle="tab" href="#subscription" th:text="#{table.subscription}"></a>
+        <a class="nav-item nav-link active" data-toggle="tab" href="#readingHole" th:text="#{tabs.readingHole}"></a>
+        <a class="nav-item nav-link" data-toggle="tab" href="#orders" th:text="#{tabs.orders}"></a>
+    </th:block>
+    <th:block th:if="${tab == 3}">
+        <a class="nav-item nav-link" data-toggle="tab" href="#subscription" th:text="#{table.subscription}"></a>
+        <a class="nav-item nav-link" data-toggle="tab" href="#readingHole" th:text="#{tabs.readingHole}"></a>
+        <a class="nav-item nav-link active" data-toggle="tab" href="#orders" th:text="#{tabs.orders}"></a>
+    </th:block>
+</nav>
+<br/>
+<div class="tab-content text-center">
+    <h4 th:text="#{reader.title}+' '+${#authentication.getName()}"></h4>
+    <div>
+        <form method="post" th:action="@{'/search?page=1'}">
+            <label>
+                <input class="form-control me-2 mr-2" type="text" name="keyWords" th:placeholder="#{index.search}">
+            </label>
+            <input class="btn btn-outline-success p-1" type="submit" th:value="#{index.find}">
+        </form>
+    </div>
+    <span th:if="${successOrder == true}" class="text-success" th:text="#{reader.success.message}"></span>
+    <br/>
+    <div class="tab-pane fade text-center" th:classappend="${tab == 1} ? 'show active' : ''" id="subscription">
+        <h5 th:text="#{table.subscription}"></h5>
+        <div class="row justify-content-center">
+            <div th:if="${orders1 != null && orders1.size() > 0}" class="col-auto">
+                <table class="table table-responsive table-bordered table-hover">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>№</th>
+                        <th th:text="#{table.title}"></th>
+                        <th th:text="#{table.authors}"></th>
+                        <th th:text="#{table.editionName}"></th>
+                        <th th:text="#{table.language}"></th>
+                        <th th:text="#{table.startDate}"></th>
+                        <th th:text="#{table.endDate}"></th>
+                        <th th:text="#{table.action}"></th>
+                    </tr>
+                    </thead>
+                    <tr th:each="order : ${orders1}">
+                        <td th:text="${order.id}"></td>
+                        <td th:text="${order.bookTranslate.title}"></td>
+                        <td th:text="${order.bookTranslate.authorsString}"></td>
+                        <td th:text="${order.bookTranslate.editionName}"></td>
+                        <td th:text="${order.bookTranslate.languageOfBook}"></td>
+                        <td th:text="${order.startDate}"></td>
+                        <td th:text="${order.endDate}"></td>
+                        <td>
+                            <a th:if="${order.getOrderStatus().name().equals('APPROVED')}" type="button"
+                               class="btn btn-outline-info"
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=1'}"
+                               th:text="#{reader.returnBook}"></a>
+                            <a th:if="${order.getOrderStatus().name().equals('OVERDUE')}" type="button"
+                               class="btn btn-outline-warning"
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=1'}"
+                               th:text="#{reader.payFine.begin}+' '+${order.getFine()}+' '+#{reader.payFine.end}"></a>
+                        </td>
+                    </tr>
+                </table>
+                <div th:if="${amount1 > 1}" class="btn-group" role="group" aria-label="Basic example">
+                    <th:block th:each="page : ${#numbers.sequence(1, amount1)}">
+                        <a class="btn btn-primary btn-rounded" th:text="${page}"
+                           th:href="@{'/reader/home?tab=1&page='+${page}}"></a>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade text-center" th:classappend="${tab == 2} ? 'show active' : ''" id="readingHole">
+        <h3 th:text="#{reader.title2}"></h3>
+        <div class="row justify-content-center">
+            <div th:if="${orders2 != null && orders2.size() > 0}" class="col-auto">
+                <table class="table table-responsive table-bordered table-hover">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>№</th>
+                        <th th:text="#{table.title}"></th>
+                        <th th:text="#{table.authors}"></th>
+                        <th th:text="#{table.editionName}"></th>
+                        <th th:text="#{table.language}"></th>
+                        <th th:text="#{table.startDate}"></th>
+                        <th th:text="#{table.endDate}"></th>
+                        <th th:text="#{table.action}"></th>
+                    </tr>
+                    </thead>
+                    <tr th:each="order : ${orders2}">
+                        <td th:text="${order.id}"></td>
+                        <td th:text="${order.bookTranslate.title}"></td>
+                        <td th:text="${order.bookTranslate.authorsString}"></td>
+                        <td th:text="${order.bookTranslate.editionName}"></td>
+                        <td th:text="${order.bookTranslate.languageOfBook}"></td>
+                        <td th:text="${order.startDate}"></td>
+                        <td th:text="${order.endDate}"></td>
+                        <td>
+                            <a type="button" class="btn btn-outline-warning"
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=2'}"
+                               th:text="#{reader.cancelOrder}"></a>
+                        </td>
+                    </tr>
+                </table>
+                <div th:if="${amount2 > 1}" class="btn-group" role="group" aria-label="Basic example">
+                    <th:block th:each="page : ${#numbers.sequence(1, amount2)}">
+                        <a class="btn btn-primary btn-rounded" th:text="${page}"
+                           th:href="@{'/reader/home?tab=2&page='+${page}}"></a>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade text-center" th:classappend="${tab == 3} ? 'show active' : ''" id="orders">
+        <h3 th:text="#{reader.title3}"></h3>
+        <div class="row justify-content-center">
+            <div th:if="${orders3 != null && orders3.size() > 0}" class="col-auto">
+                <table class="table table-responsive table-bordered table-hover">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>№</th>
+                        <th th:text="#{table.title}"></th>
+                        <th th:text="#{table.authors}"></th>
+                        <th th:text="#{table.editionName}"></th>
+                        <th th:text="#{table.language}"></th>
+                        <th th:text="#{table.startDate}"></th>
+                        <th th:text="#{table.endDate}"></th>
+                        <th th:text="#{table.action}"></th>
+                    </tr>
+                    </thead>
+                    <tr th:each="order : ${orders3}">
+                        <td th:text="${order.id}"></td>
+                        <td th:text="${order.bookTranslate.title}"></td>
+                        <td th:text="${order.bookTranslate.authorsString}"></td>
+                        <td th:text="${order.bookTranslate.editionName}"></td>
+                        <td th:text="${order.bookTranslate.languageOfBook}"></td>
+                        <td th:text="${order.startDate}"></td>
+                        <td th:text="${order.endDate}"></td>
+                        <td>
+                            <a th:if="${order.getOrderStatus().name().equals('RECEIVED')}" type="button"
+                               class="btn btn-outline-info"
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=3'}"
+                               th:text="#{reader.cancelOrder}"></a>
+                            <a th:if="${order.getOrderStatus().name().equals('CANCELED')}" type="button"
+                               class="btn btn-outline-warning"
+                               th:href="@{'/reader/deleteOrder?orderId='+${order.id}+'&tab=3'}"
+                               th:text="#{reader.deleteMessage}"></a>
+                        </td>
+                    </tr>
+                </table>
+                <div th:if="${amount3 > 1}" class="btn-group" role="group" aria-label="Basic example">
+                    <th:block th:each="page : ${#numbers.sequence(1, amount3)}">
+                        <a class="btn btn-primary btn-rounded" th:text="${page}"
+                           th:href="@{'/reader/home?tab=3&page='+${page}}"></a>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

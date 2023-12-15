@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${(#locale.language == null && #httpServletRequest.getParameter('lang') == null) || (#locale.language != null && #locale.language.equals('en')) || (#httpServletRequest.getParameter('lang') != null && #httpServletRequest.getParameter('lang').equals('en')) ? 'en' : 'uk'}">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Admin cabinet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="d-flex align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+    <span class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none h3"
+          th:text="#{header.library.name}"></span>
+    <div class="d-flex flex-row mr-3">
+        <div class="mr-2">
+            <select class="custom-select" onchange="location.href = this.options[this.selectedIndex].value">
+                <th:block
+                        th:if="${(#locale.language == null && #httpServletRequest.getParameter('lang') == null) || (#locale.language != null && #locale.language.equals('en')) || (#httpServletRequest.getParameter('lang') != null && #httpServletRequest.getParameter('lang').equals('en'))}">
+                    <option th:value="${#httpServletRequest.requestURI}+'?tab='+${tab}+'&page='+${currPage}+'&lang=en'"
+                            selected
+                            th:text="#{header.language.english}"></option>
+                    <option th:value="${#httpServletRequest.requestURI}+'?tab='+${tab}+'&page='+${currPage}+'&lang=uk'"
+                            th:text="#{header.language.ukrainian}"></option>
+                </th:block>
+                <th:block
+                        th:if="${(#httpServletRequest.getParameter('lang') != null && #httpServletRequest.getParameter('lang').equals('uk')) || #locale.language.equals('uk')}">
+                    <option th:value="${#httpServletRequest.requestURI}+'?tab='+${tab}+'&page='+${currPage}+'&lang=en'"
+                            th:text="#{header.language.english}"></option>
+                    <option th:value="${#httpServletRequest.requestURI}+'?tab='+${tab}+'&page='+${currPage}+'&lang=uk'"
+                            selected
+                            th:text="#{header.language.ukrainian}"></option>
+                </th:block>
+            </select>
+        </div>
+        <div>
+            <a class="btn btn-dark" href="/logout" th:text="#{header.logout}"></a>
+        </div>
+    </div>
+</header>
+<div class="container text-center">
+    <nav class="nav nav-tabs nav-justified">
+        <th:block th:if="${tab == 1}">
+            <a class="nav-item nav-link active" data-toggle="tab" href="#users" th:text="#{tabs.users}"></a>
+            <a class="nav-item nav-link" data-toggle="tab" href="#books" th:text="#{tabs.books}"></a>
+        </th:block>
+        <th:block th:if="${tab == 2}">
+            <a class="nav-item nav-link" data-toggle="tab" href="#users" th:text="#{tabs.users}"></a>
+            <a class="nav-item nav-link active" data-toggle="tab" href="#books" th:text="#{tabs.books}"></a>
+        </th:block>
+    </nav>
+    <br/>
+    <h3 th:text="#{admin.home.caption}+' '+${#authentication.getName()}"></h3>
+    <div class="tab-content text-center">
+        <div class="tab-pane fade text-center" th:classappend="${tab == 1} ? 'show active' : ''" id="users">
+            <div>
+                <span class="h5" th:text="#{admin.tab1.title}"></span>
+                <a class="btn btn-outline-primary btn-sm mb-2 mt-2" href="/admin/addLibrarian"
+                   th:text="#{admin.addLibrarianButton}"></a>
+            </div>
+            <div class="row justify-content-center">
+                <div th:if="${users != null || users.size() > 0}" class="col-auto">
+                    <table class="table table-responsive table-bordered table-hover">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>№</th>
+                            <th th:text="#{table.login}"></th>
+                            <th th:text="#{table.role}"></th>
+                            <th th:text="#{table.action}"></th>
+                        </tr>
+                        </thead>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.getId()}"></td>
+                            <td th:text="${user.getLogin()}"></td>
+                            <td th:text="${user.getRole().name()}"></td>
+                            <td>
+                                <a th:if="${user.isBlocked() == true}" type="button" class="btn btn-outline-success"
+                                   th:href="@{'/admin/unblockUser?id='+${user.id}}"
+                                   th:text="#{admin.unblockUserButton}"></a>
+                                <a th:if="${user.isBlocked() == false}" type="button" class="btn btn-outline-danger"
+                                   th:href="@{'/admin/blockUser?id='+${user.id}}"
+                                   th:text="#{admin.blockUserButton}"></a>
+                                <a th:if="${user.getRole().name().equals('LIBRARIAN')}" type="button"
+                                   class="btn btn-outline-danger"
+                                   th:href="@{'/admin/deleteLibrarian?id='+${user.id}}"
+                                   th:text="#{admin.deleteUserButton}"></a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div th:if="${users == null || users.size() <= 0}" class="col-auto">
+                    <span th:text="#{emptyTitle}"></span>
+                </div>
+            </div>
+            <div th:if="${amountOfUserPages > 1}" class="btn-group" role="group" aria-label="Basic example">
+                <th:block th:each="page : ${#numbers.sequence(1, amountOfUserPages)}">
+                    <a class="btn btn-primary btn-rounded" th:text="${page}"
+                       th:href="@{'/admin/home?tab=1&page='+${page}}"></a>
+                </th:block>
+            </div>
+        </div>
+        <div class="tab-pane fade text-center" th:classappend="${tab == 2} ? 'show active' : ''" id="books">
+            <div>
+                <span class="h5" th:text="#{admin.tab2.title}"></span>
+                <a class="btn btn-outline-primary btn-sm mt-2 mb-2" href="/admin/addBook"
+                   th:text="#{admin.addBookButton}"></a>
+            </div>
+            <div class="row justify-content-center">
+                <div th:if="${books != null || books.size() > 0}" class="col-auto">
+                    <table class="table table-responsive table-bordered table-hover">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>№</th>
+                            <th th:text="#{table.title}"></th>
+                            <th th:text="#{table.authors}"></th>
+                            <th th:text="#{table.language}"></th>
+                            <th th:text="#{table.editionName}"></th>
+                            <th th:text="#{table.dateOfPublication}"></th>
+                            <th th:text="#{table.description}"></th>
+                            <th th:text="#{table.price}"></th>
+                            <th th:text="#{table.amount}"></th>
+                            <th th:text="#{table.action}"></th>
+                        </tr>
+                        </thead>
+                        <tr th:each="bookWithTranslate : ${books}">
+                            <td th:text="${bookWithTranslate.book.id}"></td>
+                            <td th:text="${bookWithTranslate.bookTranslate.title}"></td>
+                            <td th:text="${bookWithTranslate.bookTranslate.authorsString}"></td>
+                            <td th:text="${bookWithTranslate.bookTranslate.languageOfBook}"></td>
+                            <td th:text="${bookWithTranslate.bookTranslate.editionName}"></td>
+                            <td th:text="${bookWithTranslate.book.publicationDate}"></td>
+                            <td th:text="${bookWithTranslate.bookTranslate.description}"></td>
+                            <td th:text="${bookWithTranslate.book.price}"></td>
+                            <td th:text="${bookWithTranslate.book.amount}"></td>
+                            <td class="justify-content-sm-between" style="width: 200px;">
+                                <a type="button" class="btn btn-outline-warning"
+                                   th:href="@{'/admin/editBook?id='+${bookWithTranslate.book.id}}"
+                                   th:text="#{admin.editButton}"></a>
+                                <a type="button" class="btn btn-outline-danger"
+                                   th:href="@{'/admin/deleteBook?id='+${bookWithTranslate.book.id}}"
+                                   th:text="#{admin.deleteBookButton}"></a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div th:if="${books == null || books.size() <= 0}" class="col-auto">
+                    <span th:text="#{emptyTitle}"></span>
+                </div>
+            </div>
+            <div th:if="${amountOfBookPages > 1}" class="btn-group" role="group" aria-label="Basic example">
+                <th:block th:each="page : ${#numbers.sequence(1, amountOfBookPages)}">
+                    <a class="btn btn-primary btn-rounded" th:text="${page}"
+                       th:href="@{'/admin/home?tab=2&page='+${page}}"></a>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
