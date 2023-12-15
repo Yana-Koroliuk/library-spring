@@ -10,6 +10,9 @@ import ua.training.repository.BookTranslateRepository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Class that represents a book tranlsate service
+ */
 @Service
 public class BookTranslateService {
 
@@ -24,15 +27,15 @@ public class BookTranslateService {
         bookTranslateRepository.save(bookTranslate);
     }
 
+    public void updateBookTranslate(BookTranslate bookTranslate) {
+        bookTranslateRepository.save(bookTranslate);
+    }
+
     public List<BookTranslate> findByTitleAndAuthorsString(String title, String authorsString) {
         return bookTranslateRepository.findBookTranslatesByTitleAndAuthorsString(title, authorsString);
     }
 
     public Optional<BookTranslate> findByBookAndLanguage(Book book, Language language) {
         return bookTranslateRepository.findByBookAndLanguage(book, language);
-    }
-
-    public void updateBookTranslate(BookTranslate bookTranslate) {
-        bookTranslateRepository.save(bookTranslate);
     }
 }

@@ -8,8 +8,12 @@ import ua.training.repository.LanguageRepository;
 
 import javax.annotation.PostConstruct;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+/**
+ * Class that represents a language service
+ */
 @Service
 public class LanguageService {
 
@@ -24,19 +28,39 @@ public class LanguageService {
         return languageRepository.findByName(name);
     }
 
+    /**
+     * The method that calls once and adds Ukrainian and English languages
+     *  to the database
+     */
+   /* @PostConstruct
+    private void initLanguages() {
+        Language uk = new Language("uk");
+        languageRepository.save(uk);
+
+        Language en = new Language("en");
+        languageRepository.save(en);
+    }
+*/
+    @PostConstruct
+    private void initLanguages() {
+        insertLanguageIfNotExists("uk");
+        insertLanguageIfNotExists("en");
+    }
+
+    private void insertLanguageIfNotExists(String name) {
+        Optional<Language> languageOpt = languageRepository.findByName(name);
+        if (!languageOpt.isPresent()) {
+            Language language = new Language(name);
+            languageRepository.save(language);
+        }
+    }
+    /**
+     * The method that returns a current language from LocaleContextHolder
+     * @return - a current language
+     */
     public Language getCurrentLanguage() {
         Locale locale = LocaleContextHolder.getLocale();
         return findByName(locale.getLanguage())
-                .orElseThrow(() -> new RuntimeException("There is no such language"));
+                .orElseThrow(() -> new NoSuchElementException("There is no such language"));
     }
-
-//    public Locale
-//    @PostConstruct
-//    private void initLanguages() {
-//        Language uk = new Language("uk");
-//        languageRepository.save(uk);
-//
-//        Language en = new Language("en");
-//        languageRepository.save(en);
-//    }
 }
