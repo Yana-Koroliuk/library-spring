@@ -168,4 +168,77 @@ public class BookTranslateRepositoryTest {
         assertEquals(1, bookTranslates.size());
     }
 
+    @Test
+    public void findAllByKeyWordAndLanguage() {
+        int expected = 2;
+
+        List<BookTranslate> translates = bookTranslateRepository.findAllByKeyWordAndLanguage("Book",
+                language2.getId());
+
+        assertEquals(expected, translates.size());
+    }
+
+    @Test
+    public void findAllByKeyWordAndLanguageOrderByBookId() {
+        List<BookTranslate> translates = bookTranslateRepository.findAllByKeyWordAndLanguage("Book",
+                language2.getId());
+
+        assertEquals(book1TranslateEn.getTitle(), translates.get(0).getTitle());
+        assertEquals(book1TranslateEn.getAuthorsString(), translates.get(0).getAuthorsString());
+        assertEquals(book1TranslateEn.getLanguageOfBook(), translates.get(0).getLanguageOfBook());
+        assertEquals(book1TranslateEn.getDescription(), translates.get(0).getDescription());
+        assertEquals(book1TranslateEn.getEditionName(), translates.get(0).getEditionName());
+        assertEquals(book2TranslateEn.getTitle(), translates.get(1).getTitle());
+        assertEquals(book2TranslateEn.getAuthorsString(), translates.get(1).getAuthorsString());
+        assertEquals(book2TranslateEn.getLanguageOfBook(), translates.get(1).getLanguageOfBook());
+        assertEquals(book2TranslateEn.getDescription(), translates.get(1).getDescription());
+        assertEquals(book2TranslateEn.getEditionName(), translates.get(1).getEditionName());
+    }
+
+    @Test
+    public void findAllByKeyWordAndLanguageOrderByDate() {
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<BookTranslate> page = bookTranslateRepository.findAllByKeyWordAndLanguageOrderByDate("Book",
+                language2.getId(), pageable);
+        List<BookTranslate> translates = page.toList();
+
+        assertEquals(book1TranslateEn.getTitle(), translates.get(0).getTitle());
+        assertEquals(book1TranslateEn.getAuthorsString(), translates.get(0).getAuthorsString());
+        assertEquals(book1TranslateEn.getLanguageOfBook(), translates.get(0).getLanguageOfBook());
+        assertEquals(book1TranslateEn.getDescription(), translates.get(0).getDescription());
+        assertEquals(book1TranslateEn.getEditionName(), translates.get(0).getEditionName());
+        assertEquals(book2TranslateEn.getTitle(), translates.get(1).getTitle());
+        assertEquals(book2TranslateEn.getAuthorsString(), translates.get(1).getAuthorsString());
+        assertEquals(book2TranslateEn.getLanguageOfBook(), translates.get(1).getLanguageOfBook());
+        assertEquals(book2TranslateEn.getDescription(), translates.get(1).getDescription());
+        assertEquals(book2TranslateEn.getEditionName(), translates.get(1).getEditionName());
+    }
+
+    @Test
+    public void findAllByKeyWordAndLanguageOrderByDateDesc() {
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<BookTranslate> page = bookTranslateRepository.findAllByKeyWordAndLanguageOrderByDateDesc("Book",
+                language2.getId(), pageable);
+        List<BookTranslate> translates = page.toList();
+
+        assertEquals(book2TranslateEn.getTitle(), translates.get(0).getTitle());
+        assertEquals(book2TranslateEn.getAuthorsString(), translates.get(0).getAuthorsString());
+        assertEquals(book2TranslateEn.getLanguageOfBook(), translates.get(0).getLanguageOfBook());
+        assertEquals(book2TranslateEn.getDescription(), translates.get(0).getDescription());
+        assertEquals(book2TranslateEn.getEditionName(), translates.get(0).getEditionName());
+        assertEquals(book1TranslateEn.getTitle(), translates.get(1).getTitle());
+        assertEquals(book1TranslateEn.getAuthorsString(), translates.get(1).getAuthorsString());
+        assertEquals(book1TranslateEn.getLanguageOfBook(), translates.get(1).getLanguageOfBook());
+        assertEquals(book1TranslateEn.getDescription(), translates.get(1).getDescription());
+        assertEquals(book1TranslateEn.getEditionName(), translates.get(1).getEditionName());
+    }
+
+    @Test
+    public void deleteAllByBook() {
+        bookTranslateRepository.deleteAllByBook(book1);
+        int expected = 2;
+
+        List<BookTranslate> bookTranslateList = (List<BookTranslate>) bookTranslateRepository.findAll();
+        assertEquals(expected, bookTranslateList.size());
+    }
 }
