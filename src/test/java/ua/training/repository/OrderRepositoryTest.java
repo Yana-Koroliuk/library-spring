@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -195,4 +195,87 @@ public class OrderRepositoryTest {
         orderRepository.delete(order22);
     }
 
+    @Test
+    public void findAllByUser() {
+        List<Order> user1Orders = orderRepository.findAllByUser(user1);
+        List<Order> user2Orders = orderRepository.findAllByUser(user2);
+
+        int expAmount1 = 3;
+        int expAmount2 = 2;
+
+        assertEquals(expAmount1, user1Orders.size());
+        assertEquals(expAmount2, user2Orders.size());
+    }
+
+    @Test
+    public void findAllByNoExistsUser() {
+        List<Order> user3Orders = orderRepository.findAllByUser(user3);
+
+        int expAmount = 0;
+
+        assertEquals(expAmount, user3Orders.size());
+    }
+
+    @Test
+    public void findAllByOrderStatus() {
+        List<Order> received = orderRepository.findAllByOrderStatus(OrderStatus.RECEIVED);
+        List<Order> approved = orderRepository.findAllByOrderStatus(OrderStatus.APPROVED);
+
+        int expAmountOfReceived = 3;
+        int expAmountOfApproved = 2;
+
+        assertEquals(expAmountOfReceived, received.size());
+        assertEquals(expAmountOfApproved, approved.size());
+    }
+
+    @Test
+    public void findAllByUserAndOrderStatus() {
+        List<Order> user1ReceivedOrders = orderRepository.findAllByUserAndOrderStatus(user1, OrderStatus.RECEIVED);
+        List<Order> user2ReceivedOrders = orderRepository.findAllByUserAndOrderStatus(user2, OrderStatus.RECEIVED);
+        List<Order> user1ApprovedOrders = orderRepository.findAllByUserAndOrderStatus(user1, OrderStatus.APPROVED);
+        List<Order> user2ApprovedOrders = orderRepository.findAllByUserAndOrderStatus(user2, OrderStatus.APPROVED);
+
+        int expAmountOfReceived1 = 2;
+        int expAmountOfApproved1 = 1;
+        int expAmountOfReceived2 = 1;
+        int expAmountOfApproved2 = 1;
+
+        assertEquals(expAmountOfReceived1, user1ReceivedOrders.size());
+        assertEquals(expAmountOfApproved1, user2ReceivedOrders.size());
+        assertEquals(expAmountOfReceived2, user1ApprovedOrders.size());
+        assertEquals(expAmountOfApproved2, user2ApprovedOrders.size());
+    }
+
+    @Test
+    public void findAllByNoExistsUserAndOrderStatus() {
+        List<Order> user3Orders = orderRepository.findAllByUserAndOrderStatus(user3, OrderStatus.APPROVED);
+
+        int expAmount = 0;
+
+        assertEquals(expAmount, user3Orders.size());
+    }
+
+    @Test
+    public void findAllByUserAndOrderStatusOrOrderStatus() {
+        List<Order> user1Orders = orderRepository.findAllByUserAndOrderStatusOrOrderStatus(user1.getId(),
+                OrderStatus.RECEIVED.toString(), OrderStatus.APPROVED.toString());
+        List<Order> user2Orders = orderRepository.findAllByUserAndOrderStatusOrOrderStatus(user2.getId(),
+                OrderStatus.RECEIVED.toString(), OrderStatus.APPROVED.toString());
+
+        int expAmount1 = 3;
+        int expAmount2 = 2;
+
+        assertEquals(expAmount1, user1Orders.size());
+        assertEquals(expAmount2, user2Orders.size());
+    }
+
+    @Test
+    public void findAllByNoExistsUserAndOrderStatusOrOrderStatus() {
+        List<Order> user3Orders = orderRepository.findAllByUserAndOrderStatusOrOrderStatus(user3.getId(),
+                OrderStatus.RECEIVED.toString(), OrderStatus.APPROVED.toString());
+
+        int expAmount = 0;
+
+        assertEquals(expAmount, user3Orders.size());
+    }
 }
