@@ -13,7 +13,7 @@ import ua.training.model.enums.Role;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -70,4 +70,25 @@ public class UserRepositoryTest {
         assertEquals(user1.getRole(), user.getRole());
     }
 
+    @Test(expected = NoSuchElementException.class)
+    public void findByNoExistsLogin() {
+        userRepository.findByLogin("noExistUser")
+                .orElseThrow(() -> new NoSuchElementException("There is on such user"));
+    }
+
+    @Test
+    public void findAllByRole() {
+        List<User> readers = userRepository.findAllByRole(Role.READER);
+        List<User> librarians = userRepository.findAllByRole(Role.LIBRARIAN);
+        List<User> admins = userRepository.findAllByRole(Role.ADMIN);
+
+
+        int expAmountOfReaders = 2;
+        int expAmountOfLibrarians = 0;
+        int expAmountOfAdmins = 1;
+
+        assertEquals(expAmountOfReaders, readers.size());
+        assertEquals(expAmountOfLibrarians, librarians.size());
+        assertEquals(expAmountOfAdmins, admins.size());
+    }
 }
