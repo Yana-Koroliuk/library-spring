@@ -10,10 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
-import ua.training.model.Book;
-import ua.training.model.BookTranslate;
-import ua.training.model.BookWithTranslate;
-import ua.training.model.Language;
+import ua.training.model.*;
 import ua.training.repository.BookRepository;
 import ua.training.repository.BookTranslateRepository;
 
@@ -24,8 +21,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
@@ -293,12 +289,130 @@ public class BookServiceTest {
         when(bookRepository.findById(bookId1)).thenReturn(Optional.of(book1));
         when(bookRepository.findById(bookId2)).thenReturn(Optional.of(book2));
 
-        List<BookWithTranslate> actual = bookService.findPaginatedAndLocatedByKeyWords(keyWords, language2, 
+        List<BookWithTranslate> actual = bookService.findPaginatedAndLocatedByKeyWords(keyWords, language2,
                 0, 2, "title", "dec");
 
         assertEquals(expected.get(0).getBook(), actual.get(0).getBook());
         assertEquals(expected.get(0).getBookTranslate(), actual.get(0).getBookTranslate());
         assertEquals(expected.get(1).getBook(), actual.get(1).getBook());
         assertEquals(expected.get(1).getBookTranslate(), actual.get(1).getBookTranslate());
+    }
+
+    @Test
+    public void findPaginatedAndLocatedByKeyWords_ForBookIdSortParam() {
+        long bookId1 = 1L;
+        long bookId2 = 2L;
+        book1TranslateEn.getBook().setId(bookId1);
+        book2TranslateEn.getBook().setId(bookId2);
+        String keyWords = "Book";
+        List<BookTranslate> bookTranslates = Arrays.asList(book1TranslateEn, book2TranslateEn);
+        List<BookWithTranslate> expected = Arrays.asList(new BookWithTranslate(book1, book1TranslateEn),
+                new BookWithTranslate(book2, book2TranslateEn));
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<BookTranslate> page = new PageImpl<>(bookTranslates, pageable, bookTranslates.size());
+        when(bookTranslateRepository.findAllByKeyWordAndLanguageOrderByBookId(eq(keyWords), eq(language2.getId()), any(Pageable.class)))
+                .thenReturn(page);
+        when(bookRepository.findById(bookId1)).thenReturn(Optional.of(book1));
+        when(bookRepository.findById(bookId2)).thenReturn(Optional.of(book2));
+
+        List<BookWithTranslate> actual = bookService.findPaginatedAndLocatedByKeyWords(keyWords, language2,
+                0, 2, "id", "dec");
+
+        assertEquals(expected.get(0).getBook(), actual.get(0).getBook());
+        assertEquals(expected.get(0).getBookTranslate(), actual.get(0).getBookTranslate());
+        assertEquals(expected.get(1).getBook(), actual.get(1).getBook());
+        assertEquals(expected.get(1).getBookTranslate(), actual.get(1).getBookTranslate());
+    }
+
+    @Test
+    public void findPaginatedAndLocatedByKeyWords_ForDateDescSortParams() {
+        long bookId1 = 1L;
+        long bookId2 = 2L;
+        book1TranslateEn.getBook().setId(bookId1);
+        book2TranslateEn.getBook().setId(bookId2);
+        String keyWords = "Book";
+        List<BookTranslate> bookTranslates = Arrays.asList(book1TranslateEn, book2TranslateEn);
+        List<BookWithTranslate> expected = Arrays.asList(new BookWithTranslate(book1, book1TranslateEn),
+                new BookWithTranslate(book2, book2TranslateEn));
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<BookTranslate> page = new PageImpl<>(bookTranslates, pageable, bookTranslates.size());
+        when(bookTranslateRepository.findAllByKeyWordAndLanguageOrderByDateDesc(eq(keyWords), eq(language2.getId()), any(Pageable.class)))
+                .thenReturn(page);
+        when(bookRepository.findById(bookId1)).thenReturn(Optional.of(book1));
+        when(bookRepository.findById(bookId2)).thenReturn(Optional.of(book2));
+
+        List<BookWithTranslate> actual = bookService.findPaginatedAndLocatedByKeyWords(keyWords, language2,
+                0, 2, "publicationDate", "dec");
+
+        assertEquals(expected.get(0).getBook(), actual.get(0).getBook());
+        assertEquals(expected.get(0).getBookTranslate(), actual.get(0).getBookTranslate());
+        assertEquals(expected.get(1).getBook(), actual.get(1).getBook());
+        assertEquals(expected.get(1).getBookTranslate(), actual.get(1).getBookTranslate());
+    }
+
+    @Test
+    public void findPaginatedAndLocatedByKeyWords_ForDateAscSortParams() {
+        long bookId1 = 1L;
+        long bookId2 = 2L;
+        book1TranslateEn.getBook().setId(bookId1);
+        book2TranslateEn.getBook().setId(bookId2);
+        String keyWords = "Book";
+        List<BookTranslate> bookTranslates = Arrays.asList(book1TranslateEn, book2TranslateEn);
+        List<BookWithTranslate> expected = Arrays.asList(new BookWithTranslate(book1, book1TranslateEn),
+                new BookWithTranslate(book2, book2TranslateEn));
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<BookTranslate> page = new PageImpl<>(bookTranslates, pageable, bookTranslates.size());
+        when(bookTranslateRepository.findAllByKeyWordAndLanguageOrderByDate(eq(keyWords), eq(language2.getId()), any(Pageable.class)))
+                .thenReturn(page);
+        when(bookRepository.findById(bookId1)).thenReturn(Optional.of(book1));
+        when(bookRepository.findById(bookId2)).thenReturn(Optional.of(book2));
+
+        List<BookWithTranslate> actual = bookService.findPaginatedAndLocatedByKeyWords(keyWords, language2,
+                0, 2, "publicationDate", "asc");
+
+        assertEquals(expected.get(0).getBook(), actual.get(0).getBook());
+        assertEquals(expected.get(0).getBookTranslate(), actual.get(0).getBookTranslate());
+        assertEquals(expected.get(1).getBook(), actual.get(1).getBook());
+        assertEquals(expected.get(1).getBookTranslate(), actual.get(1).getBookTranslate());
+    }
+
+    @Test
+    public void findPaginatedAndLocatedByKeyWords_WithNoExistsBook() {
+        long bookId1 = 1L;
+        long bookId2 = 2L;
+        book1TranslateEn.getBook().setId(bookId1);
+        book2TranslateEn.getBook().setId(bookId2);
+        String keyWords = "Book";
+        List<BookTranslate> bookTranslates = Arrays.asList(book1TranslateEn, book2TranslateEn);
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<BookTranslate> page = new PageImpl<>(bookTranslates, pageable, bookTranslates.size());
+        when(bookTranslateRepository.findAllByKeyWordAndLanguageOrderByDate(eq(keyWords), eq(language2.getId()), any(Pageable.class)))
+                .thenReturn(page);
+        when(bookRepository.findById(bookId1)).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> bookService.findPaginatedAndLocatedByKeyWords(keyWords, language2,
+                0, 2, "publicationDate", "asc"));
+    }
+
+    @Test
+    public void getAmountOfBooks() {
+        List<Book> books = Arrays.asList(book1, book2);
+        when(bookRepository.findAll()).thenReturn(books);
+
+        int actual = bookService.getAmountOfBooks();
+
+        assertEquals(books.size(),actual);
+    }
+
+    @Test
+    public void getAmountOfBooksByKeyWords() {
+        String keyWords = "Book";
+        List<BookTranslate> bookTranslates = Arrays.asList(book1TranslateEn, book2TranslateEn);
+        when(bookTranslateRepository.findAllByKeyWordAndLanguage(keyWords, language2.getId()))
+                .thenReturn(bookTranslates);
+
+        int actual = bookService.getAmountOfBooksByKeyWords(keyWords, language2);
+
+        assertEquals(bookTranslates.size(), actual);
     }
 }
