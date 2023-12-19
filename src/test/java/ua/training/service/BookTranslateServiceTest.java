@@ -17,8 +17,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 public class BookTranslateServiceTest {
@@ -129,4 +128,45 @@ public class BookTranslateServiceTest {
         assertEquals(bookTranslateList3.size(), list3.size());
     }
 
+    @Test
+    public void findByBookAndLanguage() {
+        when(bookTranslateRepository.findByBookAndLanguage(book1, language1))
+                .thenReturn(Optional.of(book1TranslateUa));
+        when(bookTranslateRepository.findByBookAndLanguage(book1, language2))
+                .thenReturn(Optional.of(book1TranslateEn));
+
+        BookTranslate bookTranslate1 = bookTranslateService.findByBookAndLanguage(book1, language1)
+                .orElseThrow(() -> new NoSuchElementException("There is no such language in database"));
+        BookTranslate bookTranslate2 = bookTranslateService.findByBookAndLanguage(book1, language2)
+                .orElseThrow(() -> new NoSuchElementException("There is no such language in database"));
+
+        assertEquals(book1TranslateUa.getTitle(), bookTranslate1.getTitle());
+        assertEquals(book1TranslateUa.getAuthorsString(), bookTranslate1.getAuthorsString());
+        assertEquals(book1TranslateUa.getLanguageOfBook(), bookTranslate1.getLanguageOfBook());
+        assertEquals(book1TranslateUa.getDescription(), bookTranslate1.getDescription());
+        assertEquals(book1TranslateUa.getEditionName(), bookTranslate1.getEditionName());
+        assertEquals(book1TranslateEn.getTitle(), bookTranslate2.getTitle());
+        assertEquals(book1TranslateEn.getAuthorsString(), bookTranslate2.getAuthorsString());
+        assertEquals(book1TranslateEn.getLanguageOfBook(), bookTranslate2.getLanguageOfBook());
+        assertEquals(book1TranslateEn.getDescription(), bookTranslate2.getDescription());
+        assertEquals(book1TranslateEn.getEditionName(), bookTranslate2.getEditionName());
+    }
+
+    @Test
+    public void findByNoExistsBookAndLanguage() {
+        when(bookTranslateRepository.findByBookAndLanguage(book2, language1))
+                .thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> bookTranslateService.findByBookAndLanguage(book2, language1)
+                .orElseThrow(() -> new NoSuchElementException("There is no such language in database")));
+    }
+
+    @Test
+    public void findByBookAndNoExistsLanguage() {
+        when(bookTranslateRepository.findByBookAndLanguage(book1, language1))
+                .thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> bookTranslateService.findByBookAndLanguage(book1, language1)
+                .orElseThrow(() -> new NoSuchElementException("There is no such language in database")));
+    }
 }
