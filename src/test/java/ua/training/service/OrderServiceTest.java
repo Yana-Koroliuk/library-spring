@@ -19,10 +19,7 @@ import ua.training.repository.OrderRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -264,5 +261,66 @@ public class OrderServiceTest {
 
         assertThrows(NoSuchElementException.class ,
                 () -> orderService.findAllByUserAndOrderStatus(user, OrderStatus.RECEIVED, 0, 2, language2));
+    }
+
+    @Test
+    public void findAllByUserAnd2OrderStatus() {
+        Pageable pageable = PageRequest.of(0, 3);
+        List<Order> expected = Arrays.asList(order11, order12, order13);
+        Page<Order> page = new PageImpl<>(expected, pageable, expected.size());
+        when(orderRepository.findAllByUserAndOrderStatusOrOrderStatus(eq(user.getId()), eq(OrderStatus.RECEIVED.toString()),
+                eq(OrderStatus.APPROVED.toString()), any(Pageable.class))).thenReturn(page);
+        when(bookTranslateRepository.findByBookAndLanguage(book1, language2)).thenReturn(Optional.of(book1TranslateEn));
+        when(bookTranslateRepository.findByBookAndLanguage(book2, language2)).thenReturn(Optional.of(book2TranslateEn));
+
+        List<Order> actual = orderService.findAllByUserAnd2OrderStatus(user, OrderStatus.RECEIVED, OrderStatus.APPROVED,
+                0, 3, language2);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void findAllByUserAnd2OrderStatusWithNoExistsTranslate() {
+        Pageable pageable = PageRequest.of(0, 3);
+        List<Order> expected = Arrays.asList(order11, order12, order13);
+        Page<Order> page = new PageImpl<>(expected, pageable, expected.size());
+        when(orderRepository.findAllByUserAndOrderStatusOrOrderStatus(eq(user.getId()), eq(OrderStatus.RECEIVED.toString()),
+                eq(OrderStatus.APPROVED.toString()), any(Pageable.class))).thenReturn(page);
+        when(bookTranslateRepository.findByBookAndLanguage(book1, language2)).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> orderService.findAllByUserAnd2OrderStatus(user, OrderStatus.RECEIVED, OrderStatus.APPROVED,
+                0, 3, language2));
+    }
+
+    @Test
+    public void getAmountByOrderStatus() {
+        List<Order> expected = Arrays.asList(order11, order12);
+        when(orderRepository.findAllByOrderStatus(OrderStatus.RECEIVED)).thenReturn(expected);
+
+        int actual = orderService.getAmountByOrderStatus(OrderStatus.RECEIVED);
+
+        assertEquals(expected.size(), actual);
+    }
+
+    @Test
+    public void getAmountByUserAndOrderStatus() {
+        List<Order> expected = Arrays.asList(order11, order12);
+        when(orderRepository.findAllByUserAndOrderStatus(user, OrderStatus.RECEIVED)).thenReturn(expected);
+
+        int actual = orderService.getAmountByUserAndOrderStatus(user, OrderStatus.RECEIVED);
+
+        assertEquals(expected.size(), actual);
+    }
+
+    @Test
+    public void getAmountByUserAnd2OrderStatus() {
+        List<Order> expected = Arrays.asList(order11, order12, order13);
+        when(orderRepository.findAllByUserAndOrderStatusOrOrderStatus(user.getId(), OrderStatus.RECEIVED.toString(),
+                OrderStatus.APPROVED.toString())).thenReturn(expected);
+
+        int actual = orderService.getAmountByUserAnd2OrderStatus(user, OrderStatus.RECEIVED, OrderStatus.APPROVED);
+
+        assertEquals(expected.size(), actual);
+
     }
 }
