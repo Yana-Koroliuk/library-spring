@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -170,5 +169,80 @@ public class UserServiceTest {
         userService.deleteById(user.getId());
 
         verify(userRepository).deleteById(user.getId());
+    }
+
+    @Test
+    public void getAmountOfUsers() {
+        User user1 = new User.Builder()
+                .id(1L)
+                .login("user1")
+                .password("password1")
+                .isBlocked(false)
+                .role(Role.READER)
+                .build();
+        User user2 = new User.Builder()
+                .id(2L)
+                .login("user2")
+                .password("password2")
+                .isBlocked(false)
+                .role(Role.READER)
+                .build();
+        List<User> users = Arrays.asList(user1, user2);
+        when(userRepository.findAll()).thenReturn(users);
+
+        int actual = userService.getAmountOfUsers();
+
+        assertEquals(users.size(), actual);
+    }
+
+    @Test
+    public void getAmountByRole() {
+        User user1 = new User.Builder()
+                .id(1L)
+                .login("user1")
+                .password("password1")
+                .isBlocked(false)
+                .role(Role.READER)
+                .build();
+        User user2 = new User.Builder()
+                .id(2L)
+                .login("user2")
+                .password("password2")
+                .isBlocked(false)
+                .role(Role.READER)
+                .build();
+        List<User> users = Arrays.asList(user1, user2);
+        when(userRepository.findAllByRole(Role.READER)).thenReturn(users);
+
+        int actual = userService.getAmountByRole(Role.READER);
+
+        assertEquals(users.size(), actual);
+    }
+
+    @Test
+    public void getCurrentUser() {
+        MockedStatic<SecurityContextHolder> contextHolderMockedStatic = mockStatic(SecurityContextHolder.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        UserDetails userDetails = mock(UserDetails.class);
+        String userName = "user";
+        User expected = new User.Builder()
+                .id(1L)
+                .login(userName)
+                .password("password1")
+                .isBlocked(false)
+                .role(Role.READER)
+                .build();
+
+        contextHolderMockedStatic.when(SecurityContextHolder::getContext).thenReturn(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUsername()).thenReturn(userName);
+        when(userRepository.findByLogin(userName)).thenReturn(Optional.of(expected));
+
+        User actual = userService.getCurrentUser();
+
+        verify(userRepository).findByLogin(anyString());
+        assertEquals(expected, actual);
     }
 }
