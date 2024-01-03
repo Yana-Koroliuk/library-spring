@@ -53,6 +53,7 @@ All code has been verified by SonarLint. All dependencies are listed in **pom.xm
 ## Built with
 #### Back-end
 * Java
+* Spring Framework
 * Maven - Dependency Management
 * PostgreSQL - Database System
 #### Dev dependencies
